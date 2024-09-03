@@ -1,0 +1,325 @@
+Act as: PHP Developer
+
+Technology stack: PHP, MySQL, CSS, HTML, JavaScript and BootStrap
+
+Functionality: Crypto Farming and Claiming System
+
+Mandatory Field: Farm Button which displays a countdown on it and the number of crypto tokens farmed
+
+
+Task: I want you to write a detailed code for a crypto farming system. The system should follow these following procedures
+Just so you know, I have my sessions declared already.
+
+$telegram_id = $_SESSION['telegram_id'] ?? null;
+
+if (isset($_GET['id'])) {
+    $_SESSION['telegram_id'] = $_GET['id'];
+    $telegram_id = $_GET['id'];
+}
+
+if (!$telegram_id) {
+    die('Telegram ID is missing.');
+}
+
+1. Initially when the user opens the system, the button is shown the the writeup "Start Farming". 
+
+2. As soon as the user clicks on the "Start Farming" button, it automatically changes to a countdown like this "0.9 $PAWS (which is the points) mined so far, 2:59:59s".
+The value increases by 0.9 every second. That is, for the first second, it's "0.9 $PAWS farmed so far, 2:59:59s". By the 2nd second, it's "1.8 $PAWS farmed so far, 2:59:58s". By the 3rd second, it's "2.7 $PAWS farmed so far, 02:59:57s". And so on till the timer is 00:00:00
+
+3. As soon as the timer gets to 00:00:00, the button automatically changes to "Claim $PAWS"
+
+4. As soon as the user clicks on "Claim $PAWS", the farmed points are automatically added to the users points balance. To achieve this, I have a table called 'users'. There's a column in it called 'points'.
+The 'points' column should be automatically updated which the farmed points which is 9720 $PAWS. 
+This is based on the following calculations:
+- 60 seconds = 1 Minute.
+- 60 Minutes = 1 Hour.
+- 1 Hour = 60 * 60 seconds = 3600 seconds
+- 3 Hours = 60 * 60 seconds * 3 = 10800 seconds
+- Total Farmed Points after the countdown of 3 Hours = 0.9$PAWS * 10800 seconds = 9720 $PAWS
+
+5. After the user has successfully claimed the farmed points and the points balance have been updated in the 'points' column of the 'users' table to reflect the addition of Total Farmed Points after the countdown of 3 Hours,
+The button changes automatically from "Claim $PAWS" to "Start Farming".
+
+6. The procedures 1 to 5 repeats itself again if the user clicks on "Start Farming Again"
+
+Note: Comment and Explain the whole codes and the processes so that I can learn and understand too.
+- Ensure that the codes are concise and meet with industry standards to enhance data protection and security.
+
+Below are the tasks.php and my MySQL database schema
+
+"tasks.php"
+
+<?php
+// Enable error reporting for debugging
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+require 'conn.php';
+
+// Start the session
+session_start();
+$telegram_id = $_SESSION['telegram_id'] ?? null;
+
+if (isset($_GET['id'])) {
+    $_SESSION['telegram_id'] = $_GET['id'];
+    $telegram_id = $_GET['id'];
+}
+
+if (!$telegram_id) {
+    die('Telegram ID is missing.');
+}
+
+// Fetch pending tasks for the user
+$pending_tasks_query = "
+    SELECT t.* 
+    FROM tasks t 
+    LEFT JOIN user_tasks ut ON t.id = ut.task_id AND ut.user_id = $telegram_id
+    WHERE ut.task_id IS NULL";
+$pending_tasks_result = $conn->query($pending_tasks_query);
+
+// Fetch completed tasks for the user
+$completed_tasks_query = "
+    SELECT t.* 
+    FROM tasks t 
+    JOIN user_tasks ut ON t.id = ut.task_id 
+    WHERE ut.user_id = $telegram_id AND ut.status = 'done'";
+$completed_tasks_result = $conn->query($completed_tasks_query);
+
+// Define logo paths
+$platform_logos = [
+    'Twitter' => 'images/x.png',
+    'Facebook' => 'images/facebook.png',
+    'Instagram' => 'images/instagram.png',
+    'Telegram' => 'images/telegram.png'
+];
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PAW</title>
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/task-styles.css">
+    <link rel="icon" href="images/logo.jpg" type="image/png">
+</head>
+<body>
+    <div id="main-content" class="container text-center mt-5">
+        <div class="container mt-5">
+            <h2>Pending Tasks</h2>
+            <?php while ($task = $pending_tasks_result->fetch_assoc()) : ?>
+            <!-- Task List -->
+            <ul class="list-group task-list">
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div class="task-details">
+                        <?php if (isset($platform_logos[$task['platform']])): ?>
+                        <img src="<?= $platform_logos[$task['platform']] ?>" alt="<?= htmlspecialchars($task['platform']) ?>" class="task-icon">
+                        <?php endif; ?>
+                        <div>
+                            <p class="task-title"><?= htmlspecialchars($task['title']); ?></p>
+                            <p class="task-subtitle"> + <?= htmlspecialchars($task['points']); ?> PAWS</p>
+                        </div>
+                    </div>
+                    <button onclick="startTask(<?= $task['id'] ?>)" id="start_<?= $task['id'] ?>" class="btn btn-secondary btn-sm">Start</button>
+                </li>
+                <p id="status_<?= $task['id'] ?>"></p>
+            </ul>
+            <?php endwhile; ?>
+        </div>
+        <div class="container mt-5">
+            <h2>Completed Tasks</h2>
+            <?php while ($task = $completed_tasks_result->fetch_assoc()) : ?>
+            <!-- Task List -->
+            <ul class="list-group task-list">
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div class="task-details">
+                        <?php if (isset($platform_logos[$task['platform']])): ?>
+                        <img src="<?= $platform_logos[$task['platform']] ?>" alt="<?= htmlspecialchars($task['platform']) ?>" class="task-icon">
+                        <?php endif; ?>
+                        <div>
+                        <p class="task-title"><?= htmlspecialchars($task['title']); ?></p>
+                            <p class="task-subtitle"> + <?= htmlspecialchars($task['points']); ?> PAWS</p>
+                        </div>
+                    </div>
+                    <button disabled id="start_<?= $task['id'] ?>" class="btn btn-success">
+                        <i class="bi bi-check-circle"></i> Success
+                    </button>
+                </li>
+            </ul>
+            <?php endwhile; ?>
+        </div>
+    </div>
+
+    <div style="height: 100px;"></div>
+
+    <!-- Footer with Bootstrap icons -->
+    <nav class="navbar navbar-dark bg-dark fixed-bottom">
+        <div class="container-fluid justify-content-around">
+            <a href="index.php?id=<?php echo $telegram_id; ?>" class="text-white text-center">
+                <i class="bi bi-house"></i><br>Home
+            </a>
+            <a href="#" class="text-white text-center">
+                <i class="bi bi-list-task"></i><br>Tasks
+            </a>
+            <a href="lead.php?id=<?php echo $telegram_id; ?>" class="text-white text-center">
+                <i class="bi bi-bar-chart"></i><br>Leaderboard
+            </a>
+            <a href="refer.php?id=<?php echo $telegram_id; ?>" class="text-white text-center">
+                <i class="bi bi-people"></i><br>Friends
+            </a>
+        </div>
+    </nav>
+
+    <script>
+        function startTask(taskId) {
+            fetch(`mark_task_done.php?task_id=${taskId}`)
+                .then(response => response.text())
+                .then(data => {
+                    if (data.trim() === "success") {
+                        document.getElementById(`start_${taskId}`).innerText = "Completed";
+                        document.getElementById(`start_${taskId}`).disabled = true;
+                    } else {
+                        alert("Failed to mark task as done.");
+                    }
+                });
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="scripts/task-script.js"></script>
+</body>
+</html>
+
+
+"MySQL database schema"
+
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Host: 127.0.0.1
+-- Generation Time: Aug 31, 2024 at 03:04 PM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: `telegram`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `referrals`
+--
+
+CREATE TABLE `referrals` (
+  `id` int(11) NOT NULL,
+  `user_id` bigint(20) NOT NULL,
+  `referred_user_id` bigint(20) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `referrals`
+--
+
+INSERT INTO `referrals` (`id`, `user_id`, `referred_user_id`, `created_at`) VALUES
+(1, 904137136, 6553586860, '2024-08-31 00:17:18');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `users`
+--
+
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL,
+  `telegram_id` bigint(20) NOT NULL,
+  `username` varchar(255) NOT NULL,
+  `referral_link` varchar(255) NOT NULL,
+  `referred_by` bigint(20) DEFAULT NULL,
+  `points` int(11) DEFAULT 0,
+  `last_reward_day` int(11) DEFAULT 0,
+  `referrals` int(11) DEFAULT 0,
+  `referral_bonus` int(11) DEFAULT 0,
+  `tasks_bonus` int(20) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `last_reward_timestamp` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`id`, `telegram_id`, `username`, `referral_link`, `referred_by`, `points`, `last_reward_day`, `referrals`, `referral_bonus`, `tasks_bonus`, `created_at`, `updated_at`, `last_reward_timestamp`) VALUES
+(1, 904137136, 'mr_royalty_jedidiah', 'https://t.me/Avilala_bot?start=904137136', NULL, 9200, 6, 0, 10000, NULL, '2024-08-31 00:15:58', '2024-08-31 00:17:57', NULL),
+(2, 6553586860, 'chiomafidelis001', 'https://t.me/Avilala_bot?start=6553586860', 904137136, 2700, 2, 0, 0, NULL, '2024-08-31 00:17:18', '2024-08-31 00:17:23', NULL);
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `referrals`
+--
+ALTER TABLE `referrals`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `referred_user_id` (`referred_user_id`);
+
+--
+-- Indexes for table `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `telegram_id` (`telegram_id`),
+  ADD KEY `telegram_id_2` (`telegram_id`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `referrals`
+--
+ALTER TABLE `referrals`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `users`
+--
+ALTER TABLE `users`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `referrals`
+--
+ALTER TABLE `referrals`
+  ADD CONSTRAINT `referrals_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`telegram_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `referrals_ibfk_2` FOREIGN KEY (`referred_user_id`) REFERENCES `users` (`telegram_id`) ON DELETE CASCADE;
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+
+Modify the code again such that it takes only 2 minutes for it to farm then the user can claim and start farming again. This time around, the farming rate is 2 $PAWS per second. That 2 $PAWS x 120 seconds = 240 $PAWS

@@ -1,0 +1,227 @@
+body {
+    background-color: #000;
+    color: #fff;
+    font-family: Arial, sans-serif;
+}
+
+.invite-text {
+    font-size: 1.8rem;
+}
+
+.dog-icon {
+    width: 100px; /* Adjust the size of the icon */
+    height: 100px; /* Ensure the height is the same as the width for a perfect circle */
+    border-radius: 50%; /* This makes the icon rounded (a circle) */
+    overflow: hidden; /* Ensures any overflow content is hidden, keeping the circular shape clean */
+    object-fit: cover; /* Ensures the logo scales properly within the circle */
+    margin-bottom: 20px; /* Adds space below the logo */
+}
+
+
+.tap-text {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+#invite-btn {
+    padding: 15px 40px;
+}
+
+.modal-content {
+    background-color: #222;
+    color: #fff;
+}
+
+.modal-header {
+    border-bottom: 1px solid #444;
+}
+
+.footer {
+    background-color: #111;
+    padding: 10px 0;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+.footer img {
+    width: 30px;
+    height: auto;
+}
+
+@media (max-width: 768px) {
+    .invite-text {
+        font-size: 1.5rem;
+    }
+
+    .dog-icon {
+        width: 80px;
+    }
+
+    .tap-text {
+        font-size: 1rem;
+    }
+
+    #invite-btn {
+        padding: 10px 30px;
+        font-size: 1rem;
+    }
+
+    .modal-content {
+        padding: 20px;
+    }
+}
+
+@media (min-width: 1440px) {
+    .invite-text {
+        font-size: 2.5rem;
+    }
+
+    .dog-icon {
+        width: 120px;
+    }
+
+    .tap-text {
+        font-size: 1.5rem;
+    }
+
+    #invite-btn {
+        padding: 20px 50px;
+        font-size: 1.2rem;
+    }
+
+    .modal-content {
+        padding: 40px;
+    }
+}
+
+
+.friends-section h2 {
+    font-size: 20px;
+    margin-bottom: 15px;
+}
+
+.friend {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    width: 100%; /* Ensure friend list items fit within the container */
+}
+
+.friend .avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+    line-height: 40px;
+    text-align: center;
+    border-radius: 50%;
+    background-color: #ff4c61; /* Updated color for avatars */
+    color: white;
+}
+
+.friend-name {
+    flex-grow: 1;
+    padding-left: 15px;
+    font-size: 18px;
+}
+
+
+/* Media Queries for Different Screen Sizes */
+
+/* Smartphones: Small */
+@media only screen and (max-width: 320px) {
+    .friend-name{
+        font-size: 16px;
+    }
+}
+
+/* Smartphones: Medium */
+@media only screen and (min-width: 321px) and (max-width: 375px) {
+    .friend-name{
+        font-size: 16px;
+    }
+}
+
+/* Smartphones: Large */
+@media only screen and (min-width: 376px) and (max-width: 414px) {
+    .friend-name{
+        font-size: 17px;
+    }
+}
+
+/* Smartphones: Extra Large */
+@media only screen and (min-width: 415px) and (max-width: 480px) {
+    .friend-name{
+        font-size: 18px;
+    }
+}
+
+/* Tablets: Small */
+@media only screen and (min-width: 481px) and (max-width: 600px) {
+    .friend-name{
+        font-size: 19px;
+    }
+}
+
+/* Tablets: Medium */
+@media only screen and (min-width: 601px) and (max-width: 768px) {
+    .friend-name{
+        font-size: 20px;
+    }
+}
+
+/* Tablets: Large */
+@media only screen and (min-width: 769px) and (max-width: 834px) {
+    .friend-name{
+        font-size: 21px;
+    }
+}
+
+/* Laptops: Small */
+@media only screen and (min-width: 835px) and (max-width: 1024px) {
+    .friend-name{
+        font-size: 22px;
+    }
+}
+
+/* Laptops: Medium */
+@media only screen and (min-width: 1025px) and (max-width: 1280px) {
+    .friend-name, .clouds {
+        font-size: 23px;
+    }
+
+    .invite-btn {
+        font-size: 23px;
+    }
+}
+
+/* Desktops: Large */
+@media only screen and (min-width: 1281px) and (max-width: 1440px) {
+    .friend-name, .clouds {
+        font-size: 24px;
+    }
+
+    .invite-btn {
+        font-size: 24px;
+    }
+}
+
+/* Desktops: Extra Large */
+@media only screen and (min-width: 1441px) and (max-width: 1920px) {
+    .friend-name, .clouds {
+        font-size: 25px;
+    }
+
+    .invite-btn {
+        font-size: 25px;
+    }
+}
+
+/* Scroll Button Visibility for Small Screens */
+@media only screen and (max-width: 600px) {
+    .scroll-button {
+        display: flex;
+    }
+}
