@@ -54,9 +54,46 @@ Adamawa State, Nigeria.
 
 ## 🛠️ Leadership & Projects
 
+
+### Lead Developer  
+**CRM - A Customer Relationship Management System with AI Sentiment Analysis** 
+*(2024)*
+Project Overview: 
+Developed a feature-rich Customer Relationship Management (CRM) system integrated with AI-driven Sentiment Analysis to enhance customer interactions and improve business decision-making.
+Key Features:
+- Automated data collection and customer management for improved business efficiency.
+- Sentiment Analysis tool to evaluate customer feedback in real-time, allowing businesses to gauge the emotional tone behind customer communications (emails, social media messages, etc.).
+- AI-powered insights and analytics dashboards for evaluating customer satisfaction trends.
+- Integrated sales tracking, lead management, and support ticketing functionalities.
+- Personalized customer engagement strategies based on sentiment scores.
+Technology Stack:
+- Python (Sentiment Analysis with TensorFlow and NLP)
+- HTML, CSS, JavaScript & BootStrap for the frontend interface
+- PHP for backend logic
+- MySQL for data storage
+- Integration with social media APIs (e.g., Twitter, Facebook) for sentiment analysis on customer interactions
+
+### Lead Developer  
+**Translate - A Medical Document Translation System**  
+*(2024)*
+Project Overview: 
+Developed a comprehensive Medical Document Translation System designed to help healthcare professionals and patients overcome language barriers in medical settings.
+Key Features:
+- Supports translation of medical documents between multiple languages while maintaining medical terminology accuracy.
+- Integrated with a medical term glossary to ensure precise translations of specialized vocabulary.
+- Implemented language-specific tone adjustments to maintain context and sensitivity in translated documents.
+- The system uses Natural Language Processing (NLP) algorithms for real-time, context-aware translations.
+- Facilitates communication between medical professionals and non-native-speaking patients, enhancing patient care.
+Technology Stack:
+- Python (NLP libraries)
+- JavaScript for frontend interaction
+- Flask for the backend API
+- MySQL database
+- Machine Translation APIs (e.g., DeepL API)
+- 
 ### Lead Developer  
 **Antenatal Care Management & Information System (ACMAIS)**  
-*(Jan 2022 - Oct 2022)*  
+*(2022)*  
 - Developed a web-based E-Health system using HTML, CSS, JavaScript, PHP, MySQL, and Bootstrap.
 - Reduced maternal and child mortality rates by automating medical reminders and referrals.
 
